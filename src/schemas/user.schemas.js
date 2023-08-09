@@ -8,3 +8,8 @@ export const signUpSchema = joi.object({
     cpf: joi.string().length(11).required(),
     phone: joi.string().length(11).required()
 })
+
+export const signInSchema = joi.object({
+    email: joi.string().email().required(),
+    password: joi.string().pattern(new RegExp('^[\\w!@#$%^&*()\\-+=<>?/\\\\[\\]{}|;:\'",.]{3,}$')).required()
+})
