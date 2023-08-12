@@ -14,3 +14,8 @@ export function getUserProducts(id) {
     const res = db.query(`SELECT * FROM products WHERE "idSeller" = $1;`, [id]);
     return res;
 }
+
+export function getProductById(id) {
+    const res = db.query(`SELECT * FROM products WHERE "id" = $1;`, [id]);
+    return res;
+}
