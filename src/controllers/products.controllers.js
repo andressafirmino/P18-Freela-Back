@@ -1,4 +1,4 @@
-import { delPhotos, delProduct, getAllProducts, getProductById, getProductsByCategory, getUserProducts, insertPhotos, postProduct, updateProduct } from "../repository/products.repository.js";
+import { delLogin, delPhotos, delProduct, getAllProducts, getProductById, getProductsByCategory, getUserProdId, getUserProducts, insertPhotos, postProduct, updateProduct } from "../repository/products.repository.js";
 import { checkEmail, checkToken } from "../repository/users.repository.js";
 
 export async function postProducts(req, res) {
@@ -16,8 +16,7 @@ export async function postProducts(req, res) {
         if (user.rows.length === 0) {
             return res.status(401).send({ message: "Usuário não autorizado!" });
         }
-        const response = await postProduct(name, category, description, user.rows[0].id, false);
-        //console.log(response.rows[0].id);        
+        const response = await postProduct(name, category, description, user.rows[0].id, false); 
         await insertPhotos(response.rows[0].id, photo, photo2, photo3);
         res.sendStatus(201);
     } catch (e) {
@@ -28,7 +27,6 @@ export async function postProducts(req, res) {
 export async function getProducts(req, res) {
     try {
         const products = await getAllProducts();
-        console.log(products);
         res.send({products: products.rows});
     } catch (e) {
         res.status(500).send(e.message);
@@ -48,6 +46,7 @@ export async function getProductsUser(req, res) {
         if (user.rows.length === 0) {
             return res.status(401).send({ message: "Usuário não autorizado!" });
         }
+        console.log(user.rows[0].id)
         const productsUser = await getUserProducts(user.rows[0].id);
         res.send(productsUser.rows);
     } catch (e) {
@@ -78,7 +77,8 @@ export async function getProductsCategory (req, res) {
 export async function updateStatus(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
-    const {id} = req.body;
+    const {id} = req.params;
+    let status = false;
 
     try {
         const logged = await checkToken(token);
@@ -87,10 +87,19 @@ export async function updateStatus(req, res) {
         }
         const user = await checkEmail(logged.rows[0].email);
         if (user.rows.length === 0) {
+            return res.status(401).send({ message: "Email não autorizado!" });
+        }
+        const idProduct = await getUserProdId(id, user.rows[0].id);
+        if (idProduct.rows.length === 0) {
             return res.status(401).send({ message: "Usuário não autorizado!" });
         }
-        const product = await updateProduct(id);
-        res.send(product.rows);
+        if(idProduct.rows[0].status) {
+            status = false;
+        } else {
+            status = true;
+        }
+        await updateProduct(status, id);
+        res.send();
     } catch (e) {
         res.status(500).send(e.message);
     }
@@ -99,7 +108,7 @@ export async function updateStatus(req, res) {
 export async function deleteProduct(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
-    const {id} = req.body;
+    const {id} = req.params;
 
     try {
         const logged = await checkToken(token);
@@ -110,10 +119,30 @@ export async function deleteProduct(req, res) {
         if (user.rows.length === 0) {
             return res.status(401).send({ message: "Usuário não autorizado!" });
         }
+        const idProduct = await getUserProdId(id, user.rows[0].id);
+        if (idProduct.rows.length === 0) {
+            return res.status(401).send({ message: "Usuário não autorizado!" });
+        }
         await delPhotos(id);
         const product = await delProduct(id);
         res.send(product.rows);
     } catch (e) {
         res.status(500).send(e.message);
     }
+}
+
+export async function deleteLogin(req, res) {
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+
+    try {
+        const logged = await checkToken(token);
+        if (logged.rows.length === 0) {
+            return res.status(401).send({ message: "Usuário não autorizado!" });
+        }
+        await delLogin(token);
+        res.send();
+} catch (e) {
+    res.status(500).send(e.message);
+} 
 }

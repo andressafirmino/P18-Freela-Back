@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import { allUser, checkEmail, checkToken, createUser, login } from "../repository/users.repository.js";
+import {  checkCpf, checkEmail, checkToken, createUser, login } from "../repository/users.repository.js";
 
 export async function signUp(req, res) {
     const { name, email, password, confirmPassword, cpf, phone } = req.body;
@@ -12,6 +12,10 @@ export async function signUp(req, res) {
         const user = await checkEmail(email);
         if (user.rows.length !== 0) {
             return res.status(409).send({ message: "Usuário já cadastrado!" });
+        }
+        const cpfUser = await checkCpf(cpf);
+        if (cpfUser.rows.length !== 0) {
+            return res.status(409).send({ message: "CPF já cadastrado!" });
         }
         const hash = bcrypt.hashSync(password, 10);
         await createUser(name, email, hash, cpf, phone);
@@ -41,7 +45,7 @@ export async function signIn(req, res) {
     }
 }
 
-export async function getUser(req, res) {
+/* export async function getUser(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
 
@@ -55,4 +59,4 @@ export async function getUser(req, res) {
     } catch (e) {
         res.status(500).send(e.message);
     }
-}
+} */
