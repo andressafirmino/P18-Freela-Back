@@ -23,7 +23,12 @@ export function getAllProducts() {
 }
 
 export function getUserProducts(id) {
-    const res = db.query(`SELECT * FROM products WHERE "idSeller" = $1;`, [id]);
+    const res = db.query(`SELECT products.*, json_agg(
+        json_build_object('id', photos."idProduct", 'photo', photos."photoUrl")) AS photos
+    FROM  products
+    JOIN photos ON products.id = photos."idProduct"
+    WHERE "idSeller" = $1
+    GROUP BY products.id;`, [id]);
     return res;
 }
 
