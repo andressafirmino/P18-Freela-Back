@@ -28,6 +28,26 @@ export function getUserProducts(id) {
 }
 
 export function getProductById(id) {
-    const res = db.query(`SELECT * FROM products WHERE "id" = $1;`, [id]);
+    const res = db.query(`SELECT products.id AS "idProduct", products.name AS "nameProduct", products.category, products.description, products.status, 
+    "idSeller", users.name AS "nameSeller", users.email, users.phone, json_agg(
+        json_build_object('id', photos."idProduct", 'photo', photos."photoUrl")) AS photos
+    FROM products
+    JOIN users ON users.id = products."idSeller"
+    JOIN photos ON products.id = photos."idProduct"
+    WHERE products.id = $1
+    GROUP BY products.id, users.id`, [id]);
+    return res;
+}
+
+export function getProductsByCategory(category) {
+    const res = db.query(`SELECT products.id AS "idProduct", products.name AS "nameProduct", products.category, products.description, products.status, 
+    "idSeller", users.name AS "nameSeller", users.email, users.phone, json_agg(
+        json_build_object('id', photos."idProduct", 'photo', photos."photoUrl")) AS photos
+    FROM products
+    JOIN users ON users.id = products."idSeller"
+    JOIN photos ON products.id = photos."idProduct"
+    WHERE products.category = $1
+    GROUP BY products.id, users.id
+    `, [category]);
     return res;
 }

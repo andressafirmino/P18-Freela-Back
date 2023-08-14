@@ -1,4 +1,4 @@
-import { getAllProducts, getProductById, getUserProducts, insertPhotos, postProduct } from "../repository/products.repository.js";
+import { getAllProducts, getProductById, getProductsByCategory, getUserProducts, insertPhotos, postProduct } from "../repository/products.repository.js";
 import { checkEmail, checkToken } from "../repository/users.repository.js";
 
 export async function postProducts(req, res) {
@@ -59,7 +59,17 @@ export async function getProductId (req, res) {
     const {id} = req.params;
     try {
         const getProduct = await getProductById(id);
-        res.send(getProduct);
+        res.send({product: getProduct.rows});
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+}
+
+export async function getProductsCategory (req, res) {
+    const {category} = req.params;
+    try {
+        const products = await getProductsByCategory(category);
+        res.send({products: products.rows});
     } catch (e) {
         res.status(500).send(e.message);
     }
