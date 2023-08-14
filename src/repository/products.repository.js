@@ -56,3 +56,8 @@ export function getProductsByCategory(category) {
     `, [category]);
     return res;
 }
+
+export function updateProduct(id) {
+    const res = db.query(`UPDATE products SET status = $1 WHERE id = $2;`, [true, id]);
+    return res;
+}

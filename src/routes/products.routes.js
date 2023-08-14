@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProductId, getProducts, getProductsCategory, getProductsUser, postProducts } from "../controllers/products.controllers.js";
+import { getProductId, getProducts, getProductsCategory, getProductsUser, postProducts, updateStatus } from "../controllers/products.controllers.js";
 
 const productsRouter = Router();
 
@@ -8,5 +8,6 @@ productsRouter.get("/", getProducts);
 productsRouter.get("/me", getProductsUser);
 productsRouter.get("/produto/:id", getProductId);
 productsRouter.get("/:category", getProductsCategory);
+productsRouter.put("/me", updateStatus);
 
 export default productsRouter;

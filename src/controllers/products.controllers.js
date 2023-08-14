@@ -1,4 +1,4 @@
-import { getAllProducts, getProductById, getProductsByCategory, getUserProducts, insertPhotos, postProduct } from "../repository/products.repository.js";
+import { getAllProducts, getProductById, getProductsByCategory, getUserProducts, insertPhotos, postProduct, updateProduct } from "../repository/products.repository.js";
 import { checkEmail, checkToken } from "../repository/users.repository.js";
 
 export async function postProducts(req, res) {
@@ -70,6 +70,27 @@ export async function getProductsCategory (req, res) {
     try {
         const products = await getProductsByCategory(category);
         res.send({products: products.rows});
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+}
+
+export async function updateStatus(req, res) {
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+    const {id} = req.body;
+
+    try {
+        const logged = await checkToken(token);
+        if (logged.rows.length === 0) {
+            return res.status(401).send({ message: "Usuário não autorizado!" });
+        }
+        const user = await checkEmail(logged.rows[0].email);
+        if (user.rows.length === 0) {
+            return res.status(401).send({ message: "Usuário não autorizado!" });
+        }
+        const product = await updateProduct(id);
+        res.send(product.rows);
     } catch (e) {
         res.status(500).send(e.message);
     }
