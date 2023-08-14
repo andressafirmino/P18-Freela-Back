@@ -61,3 +61,11 @@ export function updateProduct(id) {
     const res = db.query(`UPDATE products SET status = $1 WHERE id = $2;`, [true, id]);
     return res;
 }
+export function delPhotos(id) {
+    const res = db.query(`DELETE FROM photos WHERE "idProduct" = $1;`, [id]);
+    return res;
+}
+export function delProduct(id) {
+    const res = db.query(`DELETE FROM products WHERE id = $1;`, [id]);
+    return res;
+}

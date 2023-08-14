@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProductId, getProducts, getProductsCategory, getProductsUser, postProducts, updateStatus } from "../controllers/products.controllers.js";
+import { deleteProduct, getProductId, getProducts, getProductsCategory, getProductsUser, postProducts, updateStatus } from "../controllers/products.controllers.js";
 
 const productsRouter = Router();
 
@@ -9,5 +9,6 @@ productsRouter.get("/me", getProductsUser);
 productsRouter.get("/produto/:id", getProductId);
 productsRouter.get("/:category", getProductsCategory);
 productsRouter.put("/me", updateStatus);
+productsRouter.delete("/me", deleteProduct);
 
 export default productsRouter;
